@@ -4,11 +4,18 @@ package com.simulation.Bee;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
-public abstract class Bee implements IBehaviour {
+import java.util.UUID;
 
-    Bee(String imagePath) {
-        this.imagePath = imagePath;
-        this.imageView = new ImageView(new Image(this.imagePath));
+public abstract class Bee implements IBehaviour {
+    private final UUID id;
+
+    public UUID getId() {
+        return id;
+    }
+
+    public Bee(UUID id, String imagePath) {
+        this.id = id;
+        this.imageView = new ImageView(new Image(imagePath));
     }
 
 
@@ -18,6 +25,5 @@ public abstract class Bee implements IBehaviour {
         return imageView;
     }
 
-    protected String imagePath;
 
 }

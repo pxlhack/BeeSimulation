@@ -9,6 +9,9 @@ import javafx.scene.layout.AnchorPane;
 
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.TreeMap;
+import java.util.UUID;
 
 public class Habitat {
     private static Habitat h;
@@ -68,21 +71,23 @@ public class Habitat {
         return (time % maleSpawnTime == 0 && chance < maleSpawnChance);
     }
 
-    private void spawnWorkerBee() {
+    private void spawnWorkerBee(int dailyTime) {
         int[] c = getRandomCoordinates();
-        WorkerBee bee = new WorkerBee();
-        addToCollections(bee, c);
+        UUID id = UUID.randomUUID();
+        WorkerBee bee = new WorkerBee(id);
+        addToCollections(dailyTime, bee, c);
         workerCount++;
     }
 
-    private void spawnMaleBee() {
+    private void spawnMaleBee(int dailyTime) {
         int[] c = getRandomCoordinates();
-        MaleBee bee = new MaleBee();
-        addToCollections(bee, c);
+        UUID id = UUID.randomUUID();
+        MaleBee bee = new MaleBee(id);
+        addToCollections(dailyTime, bee, c);
         maleCount++;
     }
 
-    private void addToCollections(Bee bee, int[] c) {
+    private void addToCollections(int dailyTime, Bee bee, int[] c) {
         ImageView imageView = bee.getImageView();
         imageView.setLayoutX(c[0]);
         imageView.setLayoutY(c[1]);
@@ -92,10 +97,13 @@ public class Habitat {
         beeArray.add(bee);
         imageArray.add(imageView);
         root.getChildren().add(imageView);
+        hashSetId.add(bee.getId());
+        treeMap.put(bee.getId(), dailyTime);
     }
 
     public void killBeeFromCollection(int index) {
         Bee bee = beeArray.get(index);
+        UUID id = bee.getId();
         if (bee instanceof MaleBee) {
             maleCount--;
         } else {
@@ -104,11 +112,48 @@ public class Habitat {
         root.getChildren().remove(imageArray.get(index));
         imageArray.remove(index);
         beeArray.remove(index);
+        treeMap.remove(id);
+        hashSetId.remove(id);
+    }
+
+    public int getIndexFromId(UUID id) {
+        int k = 0;
+        for (int i = 0; i < beeArray.size(); i++) {
+            if (beeArray.get(i).getId() == id) return i;
+        }
+        return k;
     }
 
     public void update(int daily_time) {
-        if (isWorkerSpawn(daily_time)) spawnWorkerBee();
-        if (isMaleSpawn(daily_time)) spawnMaleBee();
+        if (isWorkerSpawn(daily_time)) spawnWorkerBee(daily_time);
+        if (isMaleSpawn(daily_time)) spawnMaleBee(daily_time);
+        kill(daily_time);
+    }
+
+    private void kill(int daily_time) {
+        int indexW = -1, indexM = -1;
+        for (UUID key : treeMap.keySet()) {
+            int maleDeathTime = treeMap.get(key) + MaleBee.getLifeTime();
+            int workerDeathTime = treeMap.get(key) + WorkerBee.getLifeTime();
+            int index = getIndexFromId(key);
+
+            if (maleDeathTime <= daily_time && beeArray.get(index) instanceof MaleBee) {
+                indexM = index;
+            }
+
+            if (workerDeathTime <= daily_time && beeArray.get(index) instanceof WorkerBee) {
+                indexW = index;
+            }
+
+        }
+
+        if (indexW != -1) {
+            killBeeFromCollection(indexW);
+            if (indexW < indexM) indexM--;
+        }
+
+        if (indexM != -1) killBeeFromCollection(indexM);
+
     }
 
     private int maleCount = 0;
@@ -132,6 +177,14 @@ public class Habitat {
 
     private final ArrayList<ImageView> imageArray = new ArrayList<>(1);
 
+
+    private final HashSet<UUID> hashSetId = new HashSet<>(1);
+
+    private final TreeMap<UUID, Integer> treeMap = new TreeMap<>();
+
+    public TreeMap<UUID, Integer> getTreeMap() {
+        return treeMap;
+    }
 
     private Scene scene;
 

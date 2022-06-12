@@ -1,5 +1,7 @@
 package com.simulation.MainWindow;
 
+import com.simulation.Bee.MaleBee;
+import com.simulation.Bee.WorkerBee;
 import com.simulation.Habitat.Habitat;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -7,19 +9,15 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 
 import java.net.URL;
-import java.util.Optional;
-import java.util.ResourceBundle;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 
 public class MainWindowController implements Initializable {
 
     @FXML
     private Label dailyTimeLabel;
 
-
     @FXML
-    private Button startBtn, stopBtn;
+    private Button startBtn, stopBtn, liveBtn;
 
     @FXML
     private CheckBox showTimeBtn;
@@ -33,6 +31,9 @@ public class MainWindowController implements Initializable {
 
     @FXML
     private TextField maleSpawnTimeTextField, workerSpawnTimeTextField;
+
+    @FXML
+    private TextField maleLifeTimeTextField, workerLifeTimeTextField;
 
 
     @FXML
@@ -72,6 +73,11 @@ public class MainWindowController implements Initializable {
         hideInfoMenuItem.setSelected(hideInfoBtn.isSelected());
     }
 
+    @FXML
+    private void liveBtnClick() {
+        showLiveAlert();
+    }
+
 
     @FXML
     private void startMenuItemClick() {
@@ -108,6 +114,7 @@ public class MainWindowController implements Initializable {
 
         setSpawnTime();
         setSpawnChance();
+        setLifeTime();
 
         dailyTimeLabel.setText("Time: " + dailyTime);
         mTimer.scheduleAtFixedRate(new TimerTask() {
@@ -165,6 +172,29 @@ public class MainWindowController implements Initializable {
 
     }
 
+
+    private void setLifeTime() {
+        try {
+            WorkerBee.setLifeTime(Integer.parseInt(workerLifeTimeTextField.getText()));
+
+            if (WorkerBee.getLifeTime() <= 0) throw new Error();
+        } catch (Throwable t) {
+            showNanAlert();
+            WorkerBee.setLifeTime(5);
+            workerLifeTimeTextField.setText("5");
+        }
+
+        try {
+            MaleBee.setLifeTime(Integer.parseInt(maleLifeTimeTextField.getText()));
+
+            if (MaleBee.getLifeTime() <= 0) throw new Error();
+        } catch (Throwable t) {
+            showNanAlert();
+            MaleBee.setLifeTime(3);
+            workerLifeTimeTextField.setText("3");
+        }
+    }
+
     private void setSpawnChance() {
         h.setSpawnChance(Integer.parseInt(maleBeeChanceComboBox.getValue()),
                 Integer.parseInt(workerBeeChanceComboBox.getValue()));
@@ -200,6 +230,23 @@ public class MainWindowController implements Initializable {
         }
     }
 
+    private void showLiveAlert() {
+        mTimer.cancel();
+        mTimer = new Timer();
+        dailyTimeLabel.setText("Time: " + dailyTime);
+
+        StringBuilder infoString = new StringBuilder(" ");
+        for (UUID key : h.getTreeMap().keySet()) {
+            infoString.append(key).append(" ").append(h.getTreeMap().get(key)).append("\n");
+        }
+
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Live bees");
+        alert.setHeaderText(infoString.toString());
+        alert.showAndWait();
+
+        startSpawn();
+    }
 
     public void bTyped() {
         startBtnClick();
@@ -225,6 +272,11 @@ public class MainWindowController implements Initializable {
 
         maleBeeChanceComboBox.setDisable(flag);
         workerBeeChanceComboBox.setDisable(flag);
+
+        maleLifeTimeTextField.setDisable(flag);
+        workerLifeTimeTextField.setDisable(flag);
+
+        liveBtn.setDisable(!flag);
     }
 
     @Override
@@ -237,4 +289,5 @@ public class MainWindowController implements Initializable {
         workerBeeChanceComboBox.setValue(Integer.toString(h.getWorkerSpawnChance()));
 
     }
+
 }
