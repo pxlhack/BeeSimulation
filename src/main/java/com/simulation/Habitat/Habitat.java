@@ -1,5 +1,7 @@
 package com.simulation.Habitat;
 
+import com.simulation.ArtificialIntelligence.MaleAI;
+import com.simulation.ArtificialIntelligence.WorkerAI;
 import com.simulation.Bee.Bee;
 import com.simulation.Bee.MaleBee;
 import com.simulation.Bee.WorkerBee;
@@ -74,7 +76,7 @@ public class Habitat {
     private void spawnWorkerBee(int dailyTime) {
         int[] c = getRandomCoordinates();
         UUID id = UUID.randomUUID();
-        WorkerBee bee = new WorkerBee(id);
+        WorkerBee bee = new WorkerBee(id, c);
         addToCollections(dailyTime, bee, c);
         workerCount++;
     }
@@ -87,18 +89,23 @@ public class Habitat {
         maleCount++;
     }
 
-    private void addToCollections(int dailyTime, Bee bee, int[] c) {
+    public void addToCollections(int dailyTime, Bee bee, int[] c) {
+        UUID id = bee.getId();
         ImageView imageView = bee.getImageView();
         imageView.setLayoutX(c[0]);
         imageView.setLayoutY(c[1]);
+
         imageView.setFitWidth(48);
         imageView.setFitHeight(48);
 
-        beeArray.add(bee);
-        imageArray.add(imageView);
-        root.getChildren().add(imageView);
-        hashSetId.add(bee.getId());
-        treeMap.put(bee.getId(), dailyTime);
+        synchronized (h) {
+            beeArray.add(bee);
+            imageArray.add(imageView);
+            hashSetId.add(id);
+            treeMap.put(id, dailyTime);
+            root.getChildren().add(imageView);
+            scene.setRoot(root);
+        }
     }
 
     public void killBeeFromCollection(int index) {
@@ -109,11 +116,14 @@ public class Habitat {
         } else {
             workerCount--;
         }
-        root.getChildren().remove(imageArray.get(index));
-        imageArray.remove(index);
-        beeArray.remove(index);
-        treeMap.remove(id);
-        hashSetId.remove(id);
+        synchronized (h) {
+            treeMap.remove(id);
+            hashSetId.remove(id);
+            root.getChildren().remove(imageArray.get(index));
+            imageArray.remove(index);
+            beeArray.remove(index);
+        }
+
     }
 
     public int getIndexFromId(UUID id) {
@@ -231,5 +241,92 @@ public class Habitat {
         int y = (int) ((Math.random() * maxHeight) + minHeight);
         return new int[]{x, y};
     }
+
+    public static int[] getRandomAngle(int angleNumber) {
+        int[] angle = {getLeft(), getTop()};
+        switch (angleNumber) {
+            case 0 -> angle[0] = getRight() + getLeft();
+            case 1 -> {
+                angle[0] = getRight() + getLeft();
+                angle[1] = getBottom();
+            }
+            case 2 -> angle[1] = getBottom();
+        }
+        return angle;
+    }
+
+
+    private static boolean workerThreadRunned = true;
+    private static boolean maleThreadRunned = true;
+    private static WorkerAI workerAI;
+    private static MaleAI maleAI;
+
+    public void pauseMaleAI() {
+        maleAI.pauseAI();
+    }
+
+    public void resumeMaleAI() {
+        maleAI.resumeAI();
+    }
+
+    public void pauseWorkerAI() {
+        workerAI.pauseAI();
+    }
+
+    public void resumeWorkerAI() {
+        workerAI.resumeAI();
+    }
+
+    public void startAI() {
+        workerAI = new WorkerAI();
+        workerAI.start();
+
+        maleAI = new MaleAI();
+        maleAI.start();
+    }
+
+    public void setAIPriority(int malePriority, int workerPriority) {
+        maleThreadPriority = malePriority;
+        maleAI.setPriority(malePriority);
+
+        workerThreadPriority = workerPriority;
+        workerAI.setPriority(workerPriority);
+
+    }
+
+    private static int workerThreadPriority = 5;
+
+    public int getWorkerThreadPriority() {
+        return workerThreadPriority;
+    }
+
+    private static int maleThreadPriority = 5;
+
+    public int getMaleThreadPriority() {
+        return maleThreadPriority;
+    }
+
+    public void stopAllMovement() {
+        pauseWorkerAI();
+        pauseMaleAI();
+    }
+
+    public void startAllMovement() {
+        resumeWorkerAI();
+        resumeMaleAI();
+    }
+
+    public void maleSleep() {
+        if (maleThreadRunned) pauseMaleAI();
+        else resumeMaleAI();
+        maleThreadRunned = !maleThreadRunned;
+    }
+
+    public void workerSleep() {
+        if (workerThreadRunned) pauseWorkerAI();
+        else resumeWorkerAI();
+        workerThreadRunned = !workerThreadRunned;
+    }
+
 
 }

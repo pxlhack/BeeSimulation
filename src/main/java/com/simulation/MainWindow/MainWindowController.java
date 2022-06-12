@@ -25,9 +25,15 @@ public class MainWindowController implements Initializable {
     @FXML
     private RadioButton showInfoBtn, hideInfoBtn;
 
+    @FXML
+    private Button maleSleepBtn, workerSleepBtn;
+
 
     @FXML
     private ComboBox<String> maleBeeChanceComboBox, workerBeeChanceComboBox;
+
+    @FXML
+    private ComboBox<String> maleBeePriorityComboBox, workerBeePriorityComboBox;
 
     @FXML
     private TextField maleSpawnTimeTextField, workerSpawnTimeTextField;
@@ -75,6 +81,7 @@ public class MainWindowController implements Initializable {
 
     @FXML
     private void liveBtnClick() {
+        h.stopAllMovement();
         showLiveAlert();
     }
 
@@ -100,6 +107,16 @@ public class MainWindowController implements Initializable {
         hideInfoBtn.setSelected(hideInfoMenuItem.isSelected());
     }
 
+    @FXML
+    private void workerSleepBtnClick() {
+        h.workerSleep();
+    }
+
+    @FXML
+    private void maleSleepBtnClick() {
+        h.maleSleep();
+    }
+
     public MainWindowController() {
     }
 
@@ -115,6 +132,9 @@ public class MainWindowController implements Initializable {
         setSpawnTime();
         setSpawnChance();
         setLifeTime();
+        setPriority();
+
+        h.startAllMovement();
 
         dailyTimeLabel.setText("Time: " + dailyTime);
         mTimer.scheduleAtFixedRate(new TimerTask() {
@@ -133,6 +153,8 @@ public class MainWindowController implements Initializable {
         mTimer.cancel();
         mTimer = new Timer();
         dailyTimeLabel.setText("Time: " + dailyTime);
+        h.stopAllMovement();
+
         if (showInfoBtn.isSelected()) showInfoAlert();
         else endSim();
     }
@@ -196,10 +218,13 @@ public class MainWindowController implements Initializable {
     }
 
     private void setSpawnChance() {
-        h.setSpawnChance(Integer.parseInt(maleBeeChanceComboBox.getValue()),
-                Integer.parseInt(workerBeeChanceComboBox.getValue()));
+        h.setSpawnChance(Integer.parseInt(maleBeeChanceComboBox.getValue()), Integer.parseInt(workerBeeChanceComboBox.getValue()));
     }
 
+    private void setPriority() {
+        h.setAIPriority(Integer.parseInt(maleBeePriorityComboBox.getValue()),
+                Integer.parseInt(workerBeePriorityComboBox.getValue()));
+    }
 
     private void showTime() {
         showTimeMenuItem.setSelected(showTimeBtn.isSelected());
@@ -277,6 +302,12 @@ public class MainWindowController implements Initializable {
         workerLifeTimeTextField.setDisable(flag);
 
         liveBtn.setDisable(!flag);
+
+        maleBeePriorityComboBox.setDisable(flag);
+        workerBeePriorityComboBox.setDisable(flag);
+
+        maleSleepBtn.setDisable(!flag);
+        workerSleepBtn.setDisable(!flag);
     }
 
     @Override
@@ -288,6 +319,15 @@ public class MainWindowController implements Initializable {
         workerBeeChanceComboBox.getItems().addAll(spawnChance);
         workerBeeChanceComboBox.setValue(Integer.toString(h.getWorkerSpawnChance()));
 
-    }
+        final String[] threadPriority = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10"};
 
+        maleBeePriorityComboBox.getItems().addAll(threadPriority);
+        maleBeePriorityComboBox.setValue(Integer.toString(h.getMaleThreadPriority()));
+
+        workerBeePriorityComboBox.getItems().addAll(threadPriority);
+        workerBeePriorityComboBox.setValue(Integer.toString(h.getWorkerThreadPriority()));
+
+        h.startAI();
+
+    }
 }
