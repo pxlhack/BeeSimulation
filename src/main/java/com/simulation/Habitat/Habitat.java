@@ -22,11 +22,40 @@ public class Habitat {
     }
 
 
-    private static final int maleSpawnTime = 2;
-    private static final int workerSpawnTime = 2;
+    private static int maleSpawnTime = 2;
+    private static int workerSpawnTime = 2;
 
-    private static final int workerSpawnChance = 60;
-    private static final int maleSpawnChance = 30;
+    private static int workerSpawnChance = 60;
+    private static int maleSpawnChance = 30;
+
+    public int getMaleSpawnTime() {
+        return maleSpawnTime;
+    }
+
+    public void setMaleSpawnTime(int maleSpawnTime) {
+        Habitat.maleSpawnTime = maleSpawnTime;
+    }
+
+    public int getWorkerSpawnTime() {
+        return workerSpawnTime;
+    }
+
+    public void setWorkerSpawnTime(int workerSpawnTime) {
+        Habitat.workerSpawnTime = workerSpawnTime;
+    }
+
+    public int getWorkerSpawnChance() {
+        return workerSpawnChance;
+    }
+
+    public int getMaleSpawnChance() {
+        return maleSpawnChance;
+    }
+
+    public void setSpawnChance(int maleChance, int workerChance) {
+        maleSpawnChance = maleChance;
+        workerSpawnChance = workerChance;
+    }
 
     private boolean isWorkerSpawn(int time) {
         return (time % workerSpawnTime == 0 && Math.random() * 100 <= workerSpawnChance);
@@ -149,4 +178,5 @@ public class Habitat {
         int y = (int) ((Math.random() * maxHeight) + minHeight);
         return new int[]{x, y};
     }
+
 }
