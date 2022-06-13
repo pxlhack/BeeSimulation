@@ -4,6 +4,7 @@ import com.simulation.Bee.Bee;
 import com.simulation.Bee.BeePackage;
 import com.simulation.Bee.SerializableBee;
 import com.simulation.Bee.WorkerBee;
+import com.simulation.DataBaseHandler.DataBaseHandler;
 import com.simulation.EchoClient.EchoClient;
 import com.simulation.FileDataHandler.FileDataHandler;
 import com.simulation.Habitat.Habitat;
@@ -145,6 +146,23 @@ public class TerminalController {
 
             case "clear" -> clearTerminal();
 
+            case "loadfromdb" -> {
+                DataBaseHandler.selectMaleFromTable(controller.getDailyTime());
+                DataBaseHandler.selectWorkerFromTable(controller.getDailyTime());
+            }
+
+            case "loadfromdb -m" -> DataBaseHandler.selectMaleFromTable(controller.getDailyTime());
+
+            case "loadfromdb -w" -> DataBaseHandler.selectWorkerFromTable(controller.getDailyTime());
+
+            case "savetodb" -> {
+                DataBaseHandler.insertMaleToTable();
+                DataBaseHandler.insertWorkerToTable();
+            }
+
+            case "savetodb -m" -> DataBaseHandler.insertMaleToTable();
+
+            case "savetodb -w" -> DataBaseHandler.insertWorkerToTable();
 
             case "help" -> printCommand("""
                     _______________
@@ -154,7 +172,14 @@ public class TerminalController {
                     save - save bees to file,
                     load - load bees from file,
                     close - close terminal,
-                    clear - clear terminal
+                    clear - clear terminal,
+                    connect - connect to server,
+                    disconect - disconnect from server,
+                    getclients - get a list of current clients,
+                    sendbees - send a random сount of bees to  server,
+                    getbees - get a random сount of bees from server
+                    savetodb (-m), (-w)- save (male), (worker) bees to database
+                    loadfromdb (-m), (-w) - load (male), (worker) bees from database
                     _______________
                     """);
 

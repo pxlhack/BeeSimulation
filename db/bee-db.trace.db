@@ -1,0 +1,6 @@
+2022-06-13 17:07:47 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "BEES" not found (this database is empty); SQL statement:
+INSERT INTO BEES VALUES(?, ?, ?, ?) [42104-212]
+2022-06-13 17:07:47 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "BEES" not found (this database is empty); SQL statement:
+INSERT INTO BEES VALUES(?, ?, ?, ?) [42104-212]
