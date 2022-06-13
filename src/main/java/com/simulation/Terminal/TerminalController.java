@@ -1,8 +1,17 @@
 package com.simulation.Terminal;
 
+import com.simulation.Bee.Bee;
+import com.simulation.Bee.BeePackage;
+import com.simulation.Bee.SerializableBee;
+import com.simulation.Bee.WorkerBee;
+import com.simulation.EchoClient.EchoClient;
 import com.simulation.FileDataHandler.FileDataHandler;
 import com.simulation.Habitat.Habitat;
 import com.simulation.MainWindow.MainWindowController;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+
+import java.util.ArrayList;
 
 public class TerminalController {
     private static TerminalController instance;
@@ -10,6 +19,8 @@ public class TerminalController {
     private static final MainWindowController controller = MainWindowController.getInstance();
     private static final FileDataHandler fileDataHandler = new FileDataHandler();
     private static final Habitat h = Habitat.getHabitat();
+
+    private static final EchoClient ech = new EchoClient();
 
 
     public static synchronized TerminalController getInstance() {
@@ -66,6 +77,66 @@ public class TerminalController {
             case "save" -> printCommand(String.format("Saved %d bees", fileDataHandler.save()));
 
             case "load" -> printCommand(String.format("Loaded %d bees", fileDataHandler.load(controller.getDailyTime())));
+
+            case "connect" -> {
+                ech.startConnection();
+                printCommand("You connected\n" +
+                        "Current list of clients:\n" +
+                        ech.getClientsList());
+            }
+
+            case "disconnect" -> {
+                ech.stopConnection();
+                printCommand("You disconnected");
+            }
+
+            case "sendbees" -> {
+                int size = (int) (Math.random() * (h.getBeeArray().size() - 2) + 1);
+                ArrayList<SerializableBee> serializableBeeArrayList = new ArrayList<>();
+                for (int i = 0; i < size; i++) {
+                    Bee bee = h.getBeeArray().get(0);
+                    serializableBeeArrayList.add(new SerializableBee(bee, h.getTreeMap().get(bee.getId())));
+                    h.killBeeFromCollection(0);
+                }
+
+                BeePackage beePackage = new BeePackage();
+                beePackage.setSerializableBeeArrayList(serializableBeeArrayList);
+                ech.sendObj(beePackage);
+                printCommand(String.format("Sent %d bees", size));
+            }
+
+            case "getbees" -> {
+                BeePackage beePackage = ech.getObj();
+
+                ArrayList<SerializableBee> serializableBeeArrayList = new ArrayList<>(beePackage.getSerializableBeeArrayList());
+
+                if (!serializableBeeArrayList.isEmpty()) {
+
+                    for (SerializableBee sb : serializableBeeArrayList) {
+                        Bee bee = sb.getBee();
+                        int[] c = h.getRandomCoordinates();
+
+                        ImageView imageView;
+
+                        if (bee instanceof WorkerBee) {
+                            imageView = new ImageView(new Image("C:\\image\\w_bee.png"));
+                            h.setWorkerCount(h.getWorkerCount() + 1);
+                        } else {
+                            imageView = new ImageView(new Image("C:\\image\\m_bee.png"));
+                            h.setMaleCount(h.getMaleCount() + 1);
+                        }
+
+                        bee.setImageView(imageView);
+                        h.addToCollections(controller.getDailyTime(), bee, c);
+                    }
+                    printCommand(String.format("Got %d bees", serializableBeeArrayList.size()));
+                } else {
+                    printCommand("Buffer is empty");
+                }
+
+            }
+
+            case "getclients" -> printCommand(ech.getClientsList());
 
             case "close" -> {
                 hideTerminal();
