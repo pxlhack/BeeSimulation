@@ -8,7 +8,7 @@ import com.simulation.Bee.WorkerBee;
 import javafx.scene.Scene;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
-
+import javafx.stage.Stage;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -30,8 +30,8 @@ public class Habitat {
     private static int maleSpawnTime = 2;
     private static int workerSpawnTime = 2;
 
-    private static int workerSpawnChance = 60;
-    private static int maleSpawnChance = 30;
+    private int workerSpawnChance = 60;
+    private int maleSpawnChance = 30;
 
     public int getMaleSpawnTime() {
         return maleSpawnTime;
@@ -55,6 +55,14 @@ public class Habitat {
 
     public int getMaleSpawnChance() {
         return maleSpawnChance;
+    }
+
+    public void setMaleSpawnChance(int maleSpawnChance) {
+        this.maleSpawnChance = maleSpawnChance;
+    }
+
+    public void setWorkerSpawnChance(int workerSpawnChance) {
+        this.workerSpawnChance = workerSpawnChance;
     }
 
     public void setSpawnChance(int maleChance, int workerChance) {
@@ -172,10 +180,18 @@ public class Habitat {
         return maleCount;
     }
 
+    public void setMaleCount(int maleCount) {
+        this.maleCount = maleCount;
+    }
+
     private int workerCount = 0;
 
     public int getWorkerCount() {
         return workerCount;
+    }
+
+    public void setWorkerCount(int workerCount) {
+        this.workerCount = workerCount;
     }
 
 
@@ -206,7 +222,6 @@ public class Habitat {
         this.scene = scene;
     }
 
-
     private AnchorPane root;
 
     public AnchorPane getRoot() {
@@ -215,6 +230,16 @@ public class Habitat {
 
     public void setRoot(AnchorPane root) {
         this.root = root;
+    }
+
+    private Stage stage;
+
+    public Stage getStage() {
+        return stage;
+    }
+
+    public void setStage(Stage stage) {
+        this.stage = stage;
     }
 
 
@@ -285,6 +310,26 @@ public class Habitat {
         maleAI.start();
     }
 
+    private int maleThreadPriority = 5;
+
+    public int getMaleThreadPriority() {
+        return maleThreadPriority;
+    }
+
+    public void setMaleThreadPriority(int maleThreadPriority) {
+        this.maleThreadPriority = maleThreadPriority;
+    }
+
+    private int workerThreadPriority = 5;
+
+    public int getWorkerThreadPriority() {
+        return workerThreadPriority;
+    }
+
+    public void setWorkerThreadPriority(int workerThreadPriority) {
+        this.workerThreadPriority = workerThreadPriority;
+    }
+
     public void setAIPriority(int malePriority, int workerPriority) {
         maleThreadPriority = malePriority;
         maleAI.setPriority(malePriority);
@@ -294,26 +339,15 @@ public class Habitat {
 
     }
 
-    private static int workerThreadPriority = 5;
 
-    public int getWorkerThreadPriority() {
-        return workerThreadPriority;
-    }
-
-    private static int maleThreadPriority = 5;
-
-    public int getMaleThreadPriority() {
-        return maleThreadPriority;
+    public void startAllMovement() {
+        resumeWorkerAI();
+        resumeMaleAI();
     }
 
     public void stopAllMovement() {
         pauseWorkerAI();
         pauseMaleAI();
-    }
-
-    public void startAllMovement() {
-        resumeWorkerAI();
-        resumeMaleAI();
     }
 
     public void maleSleep() {
@@ -327,6 +361,4 @@ public class Habitat {
         else resumeWorkerAI();
         workerThreadRunned = !workerThreadRunned;
     }
-
-
 }

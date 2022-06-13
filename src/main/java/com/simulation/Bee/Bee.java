@@ -4,9 +4,10 @@ package com.simulation.Bee;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
+import java.io.Serializable;
 import java.util.UUID;
 
-public abstract class Bee implements IBehaviour {
+public abstract class Bee implements IBehaviour, Serializable {
     private final UUID id;
 
     public UUID getId() {
@@ -19,11 +20,14 @@ public abstract class Bee implements IBehaviour {
     }
 
 
-    final private ImageView imageView;
+    transient private ImageView imageView;
 
     public ImageView getImageView() {
         return imageView;
     }
 
 
+    public void setImageView(ImageView imageView) {
+        this.imageView = imageView;
+    }
 }

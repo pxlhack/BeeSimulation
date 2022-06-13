@@ -2,7 +2,9 @@ package com.simulation.MainWindow;
 
 import com.simulation.Bee.MaleBee;
 import com.simulation.Bee.WorkerBee;
+import com.simulation.ConfigHandler.ConfigHandler;
 import com.simulation.Habitat.Habitat;
+import com.simulation.Terminal.TerminalController;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -12,6 +14,23 @@ import java.net.URL;
 import java.util.*;
 
 public class MainWindowController implements Initializable {
+    private static MainWindowController instance;
+    private TerminalController terminalController;
+
+    public static void setController(MainWindowController c) {
+        instance = c;
+    }
+
+    public void initController() {
+        terminalController = TerminalController.getInstance();
+    }
+
+    public static synchronized MainWindowController getInstance() {
+        if (instance == null) {
+            instance = new MainWindowController();
+        }
+        return instance;
+    }
 
     @FXML
     private Label dailyTimeLabel;
@@ -85,6 +104,10 @@ public class MainWindowController implements Initializable {
         showLiveAlert();
     }
 
+    @FXML
+    private void terminalBtnClick() {
+        terminalController.startTerminal();
+    }
 
     @FXML
     private void startMenuItemClick() {
@@ -117,6 +140,7 @@ public class MainWindowController implements Initializable {
         h.maleSleep();
     }
 
+
     public MainWindowController() {
     }
 
@@ -126,6 +150,17 @@ public class MainWindowController implements Initializable {
 
     private final Habitat h = Habitat.getHabitat();
 
+    public void startSim() {
+        startBtnClick();
+    }
+
+    public void stopSim() {
+        stopBtnClick();
+    }
+
+    public int getDailyTime() {
+        return dailyTime;
+    }
 
     private void startSpawn() {
 
@@ -285,6 +320,10 @@ public class MainWindowController implements Initializable {
         showTimeBtn.fire();
     }
 
+    public void rTyped() {
+        terminalBtnClick();
+    }
+
     private void switchBtn(boolean flag) {
         startBtn.setDisable(flag);
         stopBtn.setDisable(!flag);
@@ -312,6 +351,9 @@ public class MainWindowController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+
+        ConfigHandler configHandler = new ConfigHandler();
+        configHandler.loadConfig();
         final String[] spawnChance = {"0", "10", "20", "30", "40", "50", "60", "70", "80", "90", "100"};
         maleBeeChanceComboBox.getItems().addAll(spawnChance);
         maleBeeChanceComboBox.setValue(Integer.toString(h.getMaleSpawnChance()));
@@ -327,7 +369,19 @@ public class MainWindowController implements Initializable {
         workerBeePriorityComboBox.getItems().addAll(threadPriority);
         workerBeePriorityComboBox.setValue(Integer.toString(h.getWorkerThreadPriority()));
 
+        maleLifeTimeTextField.setText(Integer.toString(MaleBee.getLifeTime()));
+
+        workerLifeTimeTextField.setText(Integer.toString(WorkerBee.getLifeTime()));
+
+        maleSpawnTimeTextField.setText(Integer.toString(h.getMaleSpawnTime()));
+
+        workerSpawnTimeTextField.setText(Integer.toString(h.getWorkerSpawnTime()));
+
+
         h.startAI();
 
+
     }
+
+
 }
