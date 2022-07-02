@@ -8,7 +8,8 @@ import java.util.UUID;
 
 public class WorkerBee extends Bee {
     public WorkerBee(UUID id, int[] c) {
-        super(id, "C:\\image\\w_bee.png");
+
+        super(id, "src/main/resources/com/simulation/Bee/w_bee.png");
         startCoordinates = c;
         line();
     }

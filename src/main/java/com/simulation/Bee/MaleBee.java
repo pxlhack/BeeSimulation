@@ -4,7 +4,7 @@ import java.util.UUID;
 
 public class MaleBee extends Bee {
     public MaleBee(UUID id) {
-        super(id, "C:\\image\\m_bee.png");
+        super(id, "src/main/resources/com/simulation/Bee/m_bee.png");
     }
 
     private static int lifeTime = 3;

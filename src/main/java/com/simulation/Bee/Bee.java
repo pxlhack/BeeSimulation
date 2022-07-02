@@ -4,6 +4,7 @@ package com.simulation.Bee;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
+import java.io.File;
 import java.io.Serializable;
 import java.util.UUID;
 
@@ -16,7 +17,7 @@ public abstract class Bee implements IBehaviour, Serializable {
 
     public Bee(UUID id, String imagePath) {
         this.id = id;
-        this.imageView = new ImageView(new Image(imagePath));
+        this.imageView = new ImageView(new Image(new File(imagePath).toURI().toString()));
     }
 
 
