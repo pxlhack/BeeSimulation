@@ -3,7 +3,7 @@ package com.simulation.FileDataHandler;
 import com.simulation.Bee.Bee;
 import com.simulation.Bee.SerializableBee;
 import com.simulation.Bee.WorkerBee;
-import com.simulation.Habitat.Habitat;
+import com.simulation.Model.Habitat;
 import com.simulation.MainWindow.MainWindowController;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -64,10 +64,10 @@ public class FileDataHandler {
 
                     if (bee instanceof WorkerBee) {
                         imageView = new ImageView(new Image("C:\\image\\w_bee.png"));
-                        h.setWorkerCount(h.getWorkerCount() + 1);
+                        h.increaseWorkerCount();
                     } else {
                         imageView = new ImageView(new Image("C:\\image\\m_bee.png"));
-                        h.setMaleCount(h.getMaleCount() + 1);
+                        h.increaseMaleCount();
                     }
 
                     bee.setImageView(imageView);

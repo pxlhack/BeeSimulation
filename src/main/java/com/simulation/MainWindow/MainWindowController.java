@@ -3,7 +3,7 @@ package com.simulation.MainWindow;
 import com.simulation.Bee.MaleBee;
 import com.simulation.Bee.WorkerBee;
 import com.simulation.ConfigHandler.ConfigHandler;
-import com.simulation.Habitat.Habitat;
+import com.simulation.Model.Habitat;
 import com.simulation.Terminal.TerminalController;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -33,7 +33,7 @@ public class MainWindowController implements Initializable {
     }
 
     @FXML
-    private Label dailyTimeLabel;
+    private Label currentTimeLabel;
 
     @FXML
     private Button startBtn, stopBtn, liveBtn;
@@ -47,7 +47,6 @@ public class MainWindowController implements Initializable {
     @FXML
     private Button maleSleepBtn, workerSleepBtn;
 
-
     @FXML
     private ComboBox<String> maleBeeChanceComboBox, workerBeeChanceComboBox;
 
@@ -59,7 +58,6 @@ public class MainWindowController implements Initializable {
 
     @FXML
     private TextField maleLifeTimeTextField, workerLifeTimeTextField;
-
 
     @FXML
     private MenuItem startMenuItem, stopMenuItem;
@@ -145,7 +143,7 @@ public class MainWindowController implements Initializable {
     }
 
     private Timer mTimer = new Timer();
-    private int dailyTime = 0;
+    private int currentTime = 0;
     private boolean isWork = false;
 
     private final Habitat h = Habitat.getHabitat();
@@ -158,8 +156,8 @@ public class MainWindowController implements Initializable {
         stopBtnClick();
     }
 
-    public int getDailyTime() {
-        return dailyTime;
+    public int getCurrentTime() {
+        return currentTime;
     }
 
     private void startSpawn() {
@@ -171,23 +169,27 @@ public class MainWindowController implements Initializable {
 
         h.startAllMovement();
 
-        dailyTimeLabel.setText("Time: " + dailyTime);
+        setCurrentTime();
         mTimer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
                 Platform.runLater(() -> {
-                    h.update(dailyTime);
-                    dailyTimeLabel.setText("Time: " + dailyTime);
-                    dailyTime++;
+                    h.update(currentTime);
+                    setCurrentTime();
+                    currentTime++;
                 });
             }
         }, 1000, 1000);
     }
 
+    private void setCurrentTime() {
+        currentTimeLabel.setText("Time: " + currentTime);
+    }
+
     private void stopSpawn() {
         mTimer.cancel();
         mTimer = new Timer();
-        dailyTimeLabel.setText("Time: " + dailyTime);
+        setCurrentTime();
         h.stopAllMovement();
 
         if (showInfoBtn.isSelected()) showInfoAlert();
@@ -199,12 +201,11 @@ public class MainWindowController implements Initializable {
         for (int i = 0; i < allCount; i++) {
             h.killBeeFromCollection(0);
         }
-        dailyTime = 0;
+        currentTime = 0;
         isWork = !isWork;
         switchBtn(isWork);
 
     }
-
 
     private void setSpawnTime() {
         try {
@@ -229,7 +230,6 @@ public class MainWindowController implements Initializable {
 
     }
 
-
     private void setLifeTime() {
         try {
             WorkerBee.setLifeTime(Integer.parseInt(workerLifeTimeTextField.getText()));
@@ -253,7 +253,8 @@ public class MainWindowController implements Initializable {
     }
 
     private void setSpawnChance() {
-        h.setSpawnChance(Integer.parseInt(maleBeeChanceComboBox.getValue()), Integer.parseInt(workerBeeChanceComboBox.getValue()));
+        h.setMaleSpawnChance(Integer.parseInt(maleBeeChanceComboBox.getValue()));
+        h.setWorkerSpawnChance(Integer.parseInt(workerBeeChanceComboBox.getValue()));
     }
 
     private void setPriority() {
@@ -263,7 +264,7 @@ public class MainWindowController implements Initializable {
 
     private void showTime() {
         showTimeMenuItem.setSelected(showTimeBtn.isSelected());
-        dailyTimeLabel.setVisible(!dailyTimeLabel.isVisible());
+        currentTimeLabel.setVisible(!currentTimeLabel.isVisible());
     }
 
     private void showNanAlert() {
@@ -274,7 +275,7 @@ public class MainWindowController implements Initializable {
     }
 
     private void showInfoAlert() {
-        String info = "Simulation time: " + dailyTime;
+        String info = "Simulation time: " + currentTime;
         info += "\nMale count: " + h.getMaleCount();
         info += "\nWorker count: " + h.getWorkerCount();
 
@@ -293,7 +294,7 @@ public class MainWindowController implements Initializable {
     private void showLiveAlert() {
         mTimer.cancel();
         mTimer = new Timer();
-        dailyTimeLabel.setText("Time: " + dailyTime);
+        setCurrentTime();
 
         StringBuilder infoString = new StringBuilder(" ");
         for (UUID key : h.getTreeMap().keySet()) {
@@ -377,11 +378,7 @@ public class MainWindowController implements Initializable {
 
         workerSpawnTimeTextField.setText(Integer.toString(h.getWorkerSpawnTime()));
 
-
         h.startAI();
 
-
     }
-
-
 }

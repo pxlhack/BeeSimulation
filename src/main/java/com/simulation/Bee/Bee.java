@@ -8,8 +8,14 @@ import java.io.File;
 import java.io.Serializable;
 import java.util.UUID;
 
-public abstract class Bee implements IBehaviour, Serializable {
+public abstract class Bee implements Serializable {
     private final UUID id;
+
+    protected static int lifeTime;
+
+    public static int getLifeTime() {
+        return lifeTime;
+    }
 
     public UUID getId() {
         return id;
@@ -30,5 +36,10 @@ public abstract class Bee implements IBehaviour, Serializable {
 
     public void setImageView(ImageView imageView) {
         this.imageView = imageView;
+    }
+
+
+    public void move() {
+
     }
 }

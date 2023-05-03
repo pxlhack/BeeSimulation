@@ -2,7 +2,7 @@ package com.simulation.ConfigHandler;
 
 import com.simulation.Bee.MaleBee;
 import com.simulation.Bee.WorkerBee;
-import com.simulation.Habitat.Habitat;
+import com.simulation.Model.Habitat;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -12,10 +12,10 @@ import java.util.Properties;
 
 public class ConfigHandler {
     private static final Habitat h = Habitat.getHabitat();
-    private static final String path = "src/main/resources/com/simulation/ConfigHandler/config.properties";
+    private static final String CONFIG_PATH = "src/main/resources/com/simulation/ConfigHandler/config.properties";
 
     public void saveConfig() {
-        try (FileOutputStream fos = new FileOutputStream(path)) {
+        try (FileOutputStream fos = new FileOutputStream(CONFIG_PATH)) {
             Properties properties = new Properties();
 
             properties.setProperty("worker_spawn_chance", Integer.toString(h.getWorkerSpawnChance()));
@@ -39,7 +39,7 @@ public class ConfigHandler {
     }
 
     public void loadConfig() {
-        try (FileInputStream fis = new FileInputStream(path)) {
+        try (FileInputStream fis = new FileInputStream(CONFIG_PATH)) {
             Properties properties = new Properties();
             properties.load(fis);
             configReader(properties);
@@ -93,5 +93,4 @@ public class ConfigHandler {
             h.setMaleThreadPriority(num);
         }
     }
-
 }

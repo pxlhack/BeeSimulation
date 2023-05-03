@@ -7,7 +7,7 @@ import com.simulation.Bee.WorkerBee;
 import com.simulation.DataBaseHandler.DataBaseHandler;
 import com.simulation.EchoClient.EchoClient;
 import com.simulation.FileDataHandler.FileDataHandler;
-import com.simulation.Habitat.Habitat;
+import com.simulation.Model.Habitat;
 import com.simulation.MainWindow.MainWindowController;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -77,7 +77,7 @@ public class TerminalController {
 
             case "save" -> printCommand(String.format("Saved %d bees", fileDataHandler.save()));
 
-            case "load" -> printCommand(String.format("Loaded %d bees", fileDataHandler.load(controller.getDailyTime())));
+            case "load" -> printCommand(String.format("Loaded %d bees", fileDataHandler.load(controller.getCurrentTime())));
 
             case "connect" -> {
                 ech.startConnection();
@@ -121,14 +121,14 @@ public class TerminalController {
 
                         if (bee instanceof WorkerBee) {
                             imageView = new ImageView(new Image("C:\\image\\w_bee.png"));
-                            h.setWorkerCount(h.getWorkerCount() + 1);
+                            h.increaseWorkerCount();
                         } else {
                             imageView = new ImageView(new Image("C:\\image\\m_bee.png"));
-                            h.setMaleCount(h.getMaleCount() + 1);
+                            h.increaseMaleCount();
                         }
 
                         bee.setImageView(imageView);
-                        h.addToCollections(controller.getDailyTime(), bee, c);
+                        h.addToCollections(controller.getCurrentTime(), bee, c);
                     }
                     printCommand(String.format("Got %d bees", serializableBeeArrayList.size()));
                 } else {
@@ -147,13 +147,13 @@ public class TerminalController {
             case "clear" -> clearTerminal();
 
             case "loadfromdb" -> {
-                DataBaseHandler.selectMaleFromTable(controller.getDailyTime());
-                DataBaseHandler.selectWorkerFromTable(controller.getDailyTime());
+                DataBaseHandler.selectMaleFromTable(controller.getCurrentTime());
+                DataBaseHandler.selectWorkerFromTable(controller.getCurrentTime());
             }
 
-            case "loadfromdb -m" -> DataBaseHandler.selectMaleFromTable(controller.getDailyTime());
+            case "loadfromdb -m" -> DataBaseHandler.selectMaleFromTable(controller.getCurrentTime());
 
-            case "loadfromdb -w" -> DataBaseHandler.selectWorkerFromTable(controller.getDailyTime());
+            case "loadfromdb -w" -> DataBaseHandler.selectWorkerFromTable(controller.getCurrentTime());
 
             case "savetodb" -> {
                 DataBaseHandler.insertMaleToTable();

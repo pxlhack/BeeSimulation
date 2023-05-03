@@ -6,7 +6,7 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import com.simulation.Habitat.Habitat;
+import com.simulation.Model.Habitat;
 
 import java.util.Locale;
 

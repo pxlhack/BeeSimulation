@@ -3,7 +3,7 @@ package com.simulation.DataBaseHandler;
 import com.simulation.Bee.Bee;
 import com.simulation.Bee.MaleBee;
 import com.simulation.Bee.WorkerBee;
-import com.simulation.Habitat.Habitat;
+import com.simulation.Model.Habitat;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
@@ -119,7 +119,7 @@ public class DataBaseHandler {
                 int birthTime = resultSet.getInt("BIRTH_TIME");
                 int[] c = h.getRandomCoordinates();
                 ImageView imageView = new ImageView(new Image("C:\\image\\m_bee.png"));
-                h.setMaleCount(h.getMaleCount() + 1);
+                h.increaseMaleCount();
                 MaleBee bee = new MaleBee(id);
                 bee.setImageView(imageView);
                 if (birthTime > dailyTime) birthTime = dailyTime;
@@ -148,7 +148,7 @@ public class DataBaseHandler {
                 WorkerBee bee = new WorkerBee(id, c);
                 ImageView imageView = new ImageView(new Image("C:\\image\\w_bee.png"));
                 bee.setImageView(imageView);
-                h.setWorkerCount(h.getWorkerCount() + 1);
+                h.increaseWorkerCount();
                 if (birthTime > dailyTime) birthTime = dailyTime;
                 h.addToCollections(birthTime, bee, c);
             }

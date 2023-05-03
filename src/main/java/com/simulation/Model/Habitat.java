@@ -1,4 +1,4 @@
-package com.simulation.Habitat;
+package com.simulation.Model;
 
 import com.simulation.ArtificialIntelligence.MaleAI;
 import com.simulation.ArtificialIntelligence.WorkerAI;
@@ -9,12 +9,14 @@ import javafx.scene.Scene;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.TreeMap;
 import java.util.UUID;
 
+@Data
 public class Habitat {
     private static Habitat h;
 
@@ -24,51 +26,14 @@ public class Habitat {
     }
 
     private Habitat() {
+
     }
 
 
-    private static int maleSpawnTime = 2;
-    private static int workerSpawnTime = 2;
+    private int maleSpawnTime, workerSpawnTime;
+    private int workerSpawnChance, maleSpawnChance;
+    private int maleCount = 0, workerCount = 0;
 
-    private int workerSpawnChance = 60;
-    private int maleSpawnChance = 30;
-
-    public int getMaleSpawnTime() {
-        return maleSpawnTime;
-    }
-
-    public void setMaleSpawnTime(int maleSpawnTime) {
-        Habitat.maleSpawnTime = maleSpawnTime;
-    }
-
-    public int getWorkerSpawnTime() {
-        return workerSpawnTime;
-    }
-
-    public void setWorkerSpawnTime(int workerSpawnTime) {
-        Habitat.workerSpawnTime = workerSpawnTime;
-    }
-
-    public int getWorkerSpawnChance() {
-        return workerSpawnChance;
-    }
-
-    public int getMaleSpawnChance() {
-        return maleSpawnChance;
-    }
-
-    public void setMaleSpawnChance(int maleSpawnChance) {
-        this.maleSpawnChance = maleSpawnChance;
-    }
-
-    public void setWorkerSpawnChance(int workerSpawnChance) {
-        this.workerSpawnChance = workerSpawnChance;
-    }
-
-    public void setSpawnChance(int maleChance, int workerChance) {
-        maleSpawnChance = maleChance;
-        workerSpawnChance = workerChance;
-    }
 
     private boolean isWorkerSpawn(int time) {
         return (time % workerSpawnTime == 0 && Math.random() * 100 <= workerSpawnChance);
@@ -142,10 +107,18 @@ public class Habitat {
         return k;
     }
 
-    public void update(int daily_time) {
-        if (isWorkerSpawn(daily_time)) spawnWorkerBee(daily_time);
-        if (isMaleSpawn(daily_time)) spawnMaleBee(daily_time);
-        kill(daily_time);
+    public void update(int currentTime) {
+        spawn(currentTime);
+        kill(currentTime);
+    }
+
+    private void spawn(int currentTime) {
+        if (isWorkerSpawn(currentTime)) {
+            spawnWorkerBee(currentTime);
+        }
+        if (isMaleSpawn(currentTime)) {
+            spawnMaleBee(currentTime);
+        }
     }
 
     private void kill(int daily_time) {
@@ -174,32 +147,8 @@ public class Habitat {
 
     }
 
-    private int maleCount = 0;
-
-    public int getMaleCount() {
-        return maleCount;
-    }
-
-    public void setMaleCount(int maleCount) {
-        this.maleCount = maleCount;
-    }
-
-    private int workerCount = 0;
-
-    public int getWorkerCount() {
-        return workerCount;
-    }
-
-    public void setWorkerCount(int workerCount) {
-        this.workerCount = workerCount;
-    }
-
 
     private final ArrayList<Bee> beeArray = new ArrayList<>(1);
-
-    public ArrayList<Bee> getBeeArray() {
-        return beeArray;
-    }
 
     private final ArrayList<ImageView> imageArray = new ArrayList<>(1);
 
@@ -208,40 +157,11 @@ public class Habitat {
 
     private final TreeMap<UUID, Integer> treeMap = new TreeMap<>();
 
-    public TreeMap<UUID, Integer> getTreeMap() {
-        return treeMap;
-    }
-
     private Scene scene;
-
-    public Scene getScene() {
-        return scene;
-    }
-
-    public void setScene(Scene scene) {
-        this.scene = scene;
-    }
 
     private AnchorPane root;
 
-    public AnchorPane getRoot() {
-        return root;
-    }
-
-    public void setRoot(AnchorPane root) {
-        this.root = root;
-    }
-
     private Stage stage;
-
-    public Stage getStage() {
-        return stage;
-    }
-
-    public void setStage(Stage stage) {
-        this.stage = stage;
-    }
-
 
     public static int getBottom() {
         return 220;
@@ -267,18 +187,7 @@ public class Habitat {
         return new int[]{x, y};
     }
 
-    public static int[] getRandomAngle(int angleNumber) {
-        int[] angle = {getLeft(), getTop()};
-        switch (angleNumber) {
-            case 0 -> angle[0] = getRight() + getLeft();
-            case 1 -> {
-                angle[0] = getRight() + getLeft();
-                angle[1] = getBottom();
-            }
-            case 2 -> angle[1] = getBottom();
-        }
-        return angle;
-    }
+
 
 
     private static boolean workerThreadRunned = true;
@@ -312,23 +221,7 @@ public class Habitat {
 
     private int maleThreadPriority = 5;
 
-    public int getMaleThreadPriority() {
-        return maleThreadPriority;
-    }
-
-    public void setMaleThreadPriority(int maleThreadPriority) {
-        this.maleThreadPriority = maleThreadPriority;
-    }
-
     private int workerThreadPriority = 5;
-
-    public int getWorkerThreadPriority() {
-        return workerThreadPriority;
-    }
-
-    public void setWorkerThreadPriority(int workerThreadPriority) {
-        this.workerThreadPriority = workerThreadPriority;
-    }
 
     public void setAIPriority(int malePriority, int workerPriority) {
         maleThreadPriority = malePriority;
@@ -361,4 +254,17 @@ public class Habitat {
         else resumeWorkerAI();
         workerThreadRunned = !workerThreadRunned;
     }
+
+    protected boolean canEqual(final Object other) {
+        return other instanceof Habitat;
+    }
+
+    public void increaseMaleCount() {
+        this.maleCount++;
+    }
+
+    public void increaseWorkerCount() {
+        this.workerCount++;
+    }
+
 }
